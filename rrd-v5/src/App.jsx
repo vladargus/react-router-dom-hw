@@ -15,7 +15,7 @@ function App() {
         <h1>App Layout</h1>
         <Link to='/users'>Users List Page</Link>
         <Switch>
-          <Route path='/users/:userId?/:type?' component={Users} />
+          <Route path='/users/:userId?/:type?' component={UsersLayout} />
           <Route path='/' exact component={MainPage} />
           <Redirect from='*' to='/' />
         </Switch>
@@ -32,7 +32,7 @@ function MainPage() {
   )
 }
 
-function Users() {
+function UsersLayout() {
   const { userId, type } = useParams()
   const getUser = userId => users.find(user => user.id === userId)
   const users = [
@@ -51,18 +51,18 @@ function Users() {
 
       {userId ? (
         type === 'edit' ? (
-          <EditUser />
+          <EditUserPage />
         ) : (
-          <User user={getUser(userId)} userId={userId} />
+          <UserPage user={getUser(userId)} userId={userId} />
         )
       ) : (
-        <UserList users={users} />
+        <UserListPage users={users} />
       )}
     </>
   )
 }
 
-function User() {
+function UserPage() {
   const { userId, type } = useParams()
 
   if (type !== 'profile' && type !== 'edit')
@@ -84,7 +84,7 @@ function User() {
   )
 }
 
-function UserList({ users }) {
+function UserListPage({ users }) {
   return (
     <>
       <h1>Users List Page</h1>
@@ -99,7 +99,7 @@ function UserList({ users }) {
   )
 }
 
-function EditUser() {
+function EditUserPage() {
   const { userId } = useParams()
   const anotherUserId = Number(userId) + 1
 

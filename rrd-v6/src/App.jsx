@@ -6,6 +6,7 @@ import {
   Link,
   useParams,
   Navigate,
+  Outlet,
 } from 'react-router-dom'
 
 function App() {
@@ -16,7 +17,14 @@ function App() {
         <Link to='users'>Users List Page</Link>
         <Routes>
           <Route index element={<MainPage />} />
-          <Route path='users/:userId?/:type?' element={<Users />} />
+          <Route path='users' element={<UsersLayout />}>
+            <Route index element={<UserListPage />} />
+            <Route path=':userId' element={<Outlet />}>
+              <Route index element={<Navigate to='profile' />} />
+              <Route path='profile' element={<UserPage />} />
+              <Route path='edit' element={<EditUserPage />} />
+            </Route>
+          </Route>
           <Route path='*' element={<Navigate to='/' />} />
         </Routes>
       </Router>
@@ -32,41 +40,20 @@ function MainPage() {
   )
 }
 
-function Users() {
-  const { userId, type } = useParams()
-  const getUser = userId => users.find(user => user.id === userId)
-  const users = [
-    { id: 0, name: 'User 0' },
-    { id: 1, name: 'User 1' },
-    { id: 2, name: 'User 2' },
-    { id: 3, name: 'User 3' },
-    { id: 4, name: 'User 4' },
-  ]
-
+function UsersLayout() {
   return (
     <>
       <h1>Users Layout</h1>
 
       <Link to='/'>Main Page</Link>
 
-      {userId ? (
-        type === 'edit' ? (
-          <EditUser />
-        ) : (
-          <User user={getUser(userId)} userId={userId} />
-        )
-      ) : (
-        <UserList users={users} />
-      )}
+      <Outlet />
     </>
   )
 }
 
-function User() {
-  const { userId, type } = useParams()
-
-  if (type !== 'profile' && type !== 'edit')
-    return <Navigate to={`/users/${userId}/profile`} />
+function UserPage() {
+  const { userId } = useParams()
 
   return (
     <>
@@ -84,14 +71,22 @@ function User() {
   )
 }
 
-function UserList({ users }) {
+function UserListPage() {
+  const users = [
+    { id: 0, name: 'User 0' },
+    { id: 1, name: 'User 1' },
+    { id: 2, name: 'User 2' },
+    { id: 3, name: 'User 3' },
+    { id: 4, name: 'User 4' },
+  ]
+
   return (
     <>
       <h1>Users List Page</h1>
       <ul>
         {users.map(user => (
           <li key={user.id}>
-            <Link to={`/users/${user.id}/profile`}>{user.name}</Link>
+            <Link to={`/users/${user.id}`}>{user.name}</Link>
           </li>
         ))}
       </ul>
@@ -99,16 +94,16 @@ function UserList({ users }) {
   )
 }
 
-function EditUser() {
+function EditUserPage() {
   const { userId } = useParams()
-  const anotherUserId = Number(userId) + 1
+  const anotherUserId = Number(userId) ? Number(userId) + 1 : userId + 1
 
   return (
     <>
       <h1>Edit User Page</h1>
       <ul>
         <li>
-          <Link to={`/users/${userId}/profile`}>Users profile Page</Link>
+          <Link to={`/users/${userId}`}>Users profile Page</Link>
         </li>
         <li>
           <Link to={`/users/${anotherUserId}`}>Another User</Link>
